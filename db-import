@@ -33,7 +33,7 @@ then
   logExit failed 1
 fi
 
-# check status of optimize request - original format
+# log status of DIH request - original format
 echo ${rs}
 logMessage response: ${rs}
 
