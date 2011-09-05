@@ -1,0 +1,40 @@
+#!/bin/bash
+orig_dir=$(pwd)
+cd ${0%/*}/..
+solr_root=$(pwd)
+cd ${orig_dir}
+
+unset solr_hostname solr_port webapp_name user verbose debug solr_url
+. ${solr_root}/bin/scripts-util
+
+# set up variables
+prog=${0##*/}
+log=${solr_root}/logs/${prog}.log
+
+echo ${solr_hostname}
+echo ${solr_port}
+echo ${webapp_name}
+
+cur_url=http://${solr_hostname}:${solr_port}/${webapp_name}/'dataimport?command=delta-import&clean=false&commit=true'
+
+fixUser "$@"
+
+setStartTime
+
+logMessage started by $oldwhoami
+logMessage command: $0 $@
+logMessage url: ${cur_url}
+
+rs=`curl ${cur_url} -s -H 'Content-type:text/xml; charset=utf-8'`
+if [[ $? != 0 ]]
+then
+  logMessage failed to connect to Solr server at ${cur_url}
+  logMessage optimize failed
+  logExit failed 1
+fi
+
+# check status of optimize request - original format
+echo ${rs}
+logMessage response: ${rs}
+
+logExit ended 0
